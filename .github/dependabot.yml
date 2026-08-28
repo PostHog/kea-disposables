@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'chore'
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: 'chore'
+    # Only devDependencies live here (kea is a peer, and there are no runtime deps), so a
+    # bump can't reach consumers — group them into one PR rather than one per package.
+    groups:
+      dev-dependencies:
+        patterns: ['*']

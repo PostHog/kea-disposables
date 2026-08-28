@@ -1,0 +1,8 @@
+{
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 110,
+  "sortPackageJson": false,
+  "ignorePatterns": ["dist", "node_modules", "coverage", "pnpm-lock.yaml"]
+}

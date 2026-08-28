@@ -1,0 +1,90 @@
+name: Release
+
+# Changesets release flow. A changeset landing on main opens (or updates) a "Version Packages"
+# PR carrying the version bump and the CHANGELOG entry; merging that PR publishes to npm with
+# trusted publishing (OIDC), then tags the release on GitHub.
+#
+# With no changesets pending, the action instead publishes any version in package.json that is
+# not yet on the registry. That is how 1.0.0 ships: the repo is already at 1.0.0 over a
+# placeholder 0.0.0 on npm, so the first push to main publishes it with no version PR.
+#
+# Repo setup this depends on:
+#   - npm trusted publishing configured for `kea-disposables` pointing at this repo + this
+#     workflow file (Settings → Publishing access on npmjs.com). No NPM_TOKEN needed.
+#     A trusted publisher can only be configured on a package that already exists, so a
+#     placeholder 0.0.0 was published by hand to claim the name — see CONTRIBUTING.md.
+#   - Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
+#     enabled, so the action can open the version PR.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Version or publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit the version bump, create the release tag
+      pull-requests: write # open/update the "Version Packages" PR
+      id-token: write # npm trusted publishing (OIDC)
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: pnpm
+
+      # Trusted publishing (OIDC) needs a recent npm; the one bundled with node may predate it.
+      - name: Ensure npm supports trusted publishing (OIDC)
+        run: npm install -g npm@latest
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      # With changesets pending, this opens/updates the version PR and publishes nothing.
+      # With none pending (i.e. the version PR just merged), it runs `pnpm release`, which
+      # publishes any version not yet on the registry, then pushes the tag and creates the
+      # GitHub release from the CHANGELOG entry.
+      - name: Create version PR or publish
+        id: changesets
+        uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          version-script: pnpm changeset version
+          publish-script: pnpm release
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
+          create-github-releases: true
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'
+
+      # Values go through env rather than being interpolated into the script: published-packages
+      # is JSON, and its embedded quotes would otherwise break the shell string.
+      - name: Summarise
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.published }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs['published-packages'] }}
+          PR_NUMBER: ${{ steps.changesets.outputs['pr-number'] }}
+        run: |
+          if [ "$PUBLISHED" = "true" ]; then
+            echo "Published: \`$PUBLISHED_PACKAGES\`" >> "$GITHUB_STEP_SUMMARY"
+          elif [ -n "$PR_NUMBER" ]; then
+            echo "Version PR #$PR_NUMBER is open — merge it to publish." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Nothing to release." >> "$GITHUB_STEP_SUMMARY"
+          fi
