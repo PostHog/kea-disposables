@@ -6,6 +6,11 @@ updates:
       interval: monthly
     commit-message:
       prefix: 'chore'
+    # Supply-chain cooldown, matching `minimumReleaseAge` in pnpm-workspace.yaml and
+    # `min-release-age` in .npmrc: don't propose anything published in the last 7 days, so a
+    # compromised release can't be auto-PR'd into the repo before it's caught.
+    cooldown:
+      default-days: 7
     groups:
       actions:
         patterns: ['*']
@@ -16,6 +21,8 @@ updates:
       interval: monthly
     commit-message:
       prefix: 'chore'
+    cooldown:
+      default-days: 7
     # Only devDependencies live here (kea is a peer, and there are no runtime deps), so a
     # bump can't reach consumers — group them into one PR rather than one per package.
     groups:
