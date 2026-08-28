@@ -99,15 +99,13 @@ don't drop it.
 ### The 1.0.0 release
 
 A trusted publisher is configured from a package's settings page on npmjs.com, which only exists
-once the package does — so a placeholder `0.0.0` is published by hand to claim the name, and the
-trusted publisher is configured against it. That is a one-time bootstrap and has already been done.
+once the package does — so a placeholder `0.0.0` was published by hand to claim the name, and the
+trusted publisher configured against it. That is a one-time bootstrap and is already done.
 
-`package.json` in this repo is already at `1.0.0` with no pending changesets. So the first push to
-`main` publishes the real thing: the Release workflow sees no changesets, runs `pnpm release`, and
-`changeset publish` uploads `1.0.0` because only `0.0.0` is on the registry. No version PR is
-involved for this one release.
-
-Every release after that goes through the normal changeset flow above.
+`package.json` therefore sits at `0.0.0`, matching the registry, and `.changeset/initial-release.md`
+carries a `major` bump. So 1.0.0 ships through the ordinary flow rather than around it: the Release
+workflow opens the version PR, merging it applies the bump and writes the `CHANGELOG.md` entry, and
+the publish that follows uploads `1.0.0`.
 
 ## Relationship to the PostHog monorepo
 

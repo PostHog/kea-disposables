@@ -5,14 +5,14 @@ name: Release
 # trusted publishing (OIDC), then tags the release on GitHub.
 #
 # With no changesets pending, the action instead publishes any version in package.json that is
-# not yet on the registry. That is how 1.0.0 ships: the repo is already at 1.0.0 over a
-# placeholder 0.0.0 on npm, so the first push to main publishes it with no version PR.
+# not yet on the registry.
 #
 # Repo setup this depends on:
 #   - npm trusted publishing configured for `kea-disposables` pointing at this repo + this
 #     workflow file (Settings → Publishing access on npmjs.com). No NPM_TOKEN needed.
 #     A trusted publisher can only be configured on a package that already exists, so a
-#     placeholder 0.0.0 was published by hand to claim the name — see CONTRIBUTING.md.
+#     placeholder 0.0.0 was published by hand to claim the name. 1.0.0 then ships through the
+#     ordinary changeset flow on top of it — see CONTRIBUTING.md.
 #   - Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
 #     enabled, so the action can open the version PR.
 

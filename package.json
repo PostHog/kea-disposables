@@ -1,6 +1,6 @@
 {
   "name": "kea-disposables",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Kea plugin for automatic resource cleanup. Register timers, listeners and subscriptions with a setup function that returns a cleanup function — teardown runs on unmount, and background work auto-pauses while the tab is hidden.",
   "license": "MIT",
   "author": "PostHog <hey@posthog.com>",
@@ -8,7 +8,7 @@
     "Paul D'Ambra <paul@posthog.com>",
     "Marius Andra <marius.andra@gmail.com>",
     "Julian Bez <julian@posthog.com>",
-    "Sam Pennington <56024559+sampennington@users.noreply.github.com>",
+    "Sam Pennington <sam@posthog.com>",
     "Rafa Audibert <rafael@posthog.com>"
   ],
   "homepage": "https://github.com/PostHog/kea-disposables#readme",
