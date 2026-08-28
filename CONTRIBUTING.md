@@ -3,22 +3,25 @@
 ## Setup
 
 ```bash
-pnpm install
+npm install
 ```
 
-Node 22+ and pnpm 10 for development (see `.nvmrc` and the `packageManager` field). The
-published package itself supports Node 20+.
+Node 22+ for development (see `.nvmrc`); the published package itself supports Node 20+.
+
+npm is the package manager here, not pnpm — `changeset publish` shells out to whichever tool
+the repo uses to query the registry, and the pnpm path crashed on that query in CI. Don't
+reintroduce a `pnpm-lock.yaml` or `pnpm-workspace.yaml` without re-testing a real release.
 
 ## Working on it
 
 ```bash
-pnpm test          # vitest, against src/
-pnpm test:watch
-pnpm typecheck
-pnpm lint          # oxlint + oxfmt --check
-pnpm format        # oxfmt --write
-pnpm build         # tsdown -> dist/ (ESM + CJS + types)
-pnpm test:dist     # smoke-test the built artifacts (run after build)
+npm test          # vitest, against src/
+npm run test:watch
+npm run typecheck
+npm run lint          # oxlint + oxfmt --check
+npm run format        # oxfmt --write
+npm run build         # tsdown -> dist/ (ESM + CJS + types)
+npm run test:dist     # smoke-test the built artifacts (run after build)
 ```
 
 The test suite runs under jsdom because the plugin listens for `visibilitychange`.
@@ -29,7 +32,7 @@ SSR-safe behaviour; keep it that way.
 
 1. Branch off `main`.
 2. Make the change, with a test that fails without it.
-3. Run `pnpm changeset` and pick a bump type. Commit the generated file — the release pipeline
+3. Run `npx changeset` and pick a bump type. Commit the generated file — the release pipeline
    reads it, and a change that lands without one never gets released. Nothing enforces this, so
    it is on the author and the reviewer to notice. A PR that genuinely needs no release (docs,
    CI, a dev-dependency bump) needs no changeset at all.

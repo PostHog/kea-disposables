@@ -59,7 +59,9 @@ adjusting it to match.
 
 ## Conventions
 
-- oxlint + oxfmt (`pnpm lint` / `pnpm format`). Single quotes, no semicolons, 2-space indent —
+- npm, not pnpm: `changeset publish` picks its registry-query tool from the repo's package
+  manager, and the pnpm path crashed in CI. Keep `package-lock.json` as the only lockfile.
+- oxlint + oxfmt (`npm run lint` / `npm run format`). Single quotes, no semicolons, 2-space indent —
   oxfmt is opinionated about the indent and does not take a width option.
 - The peer range is `kea >= 3`, matching every first-party kea plugin; CI runs the suite against
   kea 3.0 (the floor), 3 stable, and the v4 `next` prerelease. Don't use kea 4-only APIs.
@@ -68,12 +70,12 @@ adjusting it to match.
 - There is no supported way to type `logic.cache.disposables` globally: kea declares `cache` as
   `Record<string, any>`, which an interface augmentation cannot narrow. `DisposablesCache` and
   `getDisposables()` are the workarounds; no first-party kea plugin does better.
-- The package is dual ESM + CJS with types for both. `pnpm exec publint` and
-  `pnpm exec attw --pack .` must stay clean; CI enforces both.
+- The package is dual ESM + CJS with types for both. `npx --no-install publint` and
+  `npx --no-install attw --pack .` must stay clean; CI enforces both.
 - No runtime dependencies, and it should stay that way.
 - Nothing may touch `document` unguarded — use `hasDocument()` / `isPageHidden()`.
 
 ## Releasing
 
-Changesets. `pnpm changeset` with every user-facing change; merging the generated "version
+Changesets. `npx changeset` with every user-facing change; merging the generated "version
 packages" PR publishes to npm via OIDC. See [CONTRIBUTING.md](./CONTRIBUTING.md).

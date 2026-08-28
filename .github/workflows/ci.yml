@@ -19,33 +19,31 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          cache: pnpm
+          cache: npm
 
-      - run: pnpm install --frozen-lockfile
+      - run: npm ci
 
       - name: Lint
-        run: pnpm lint
+        run: npm run lint
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npm run typecheck
 
       - name: Build
-        run: pnpm build
+        run: npm run build
 
       # The vitest suite runs against src/; this proves the artifact that actually ships loads
       # and works from both an ESM and a CJS consumer.
       - name: Smoke-test the built package
-        run: pnpm test:dist
+        run: npm run test:dist
 
       - name: Validate package exports
         run: |
-          pnpm exec publint
-          pnpm exec attw --pack .
+          npx --no-install publint
+          npx --no-install attw --pack .
 
   test:
     name: Test (kea ${{ matrix.kea }})
@@ -59,23 +57,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          cache: pnpm
+          cache: npm
 
-      - run: pnpm install --frozen-lockfile
+      - run: npm ci
 
       - name: Install kea@${{ matrix.kea }}
         if: matrix.kea != '3'
         env:
           KEA_VERSION: ${{ matrix.kea }}
-        run: pnpm add -D --ignore-scripts "kea@$KEA_VERSION"
+        run: npm install --no-save --ignore-scripts "kea@$KEA_VERSION"
 
       - name: Report resolved kea version
         run: node -p "'kea ' + require('kea/package.json').version"
 
       - name: Test
-        run: pnpm test
+        run: npm test

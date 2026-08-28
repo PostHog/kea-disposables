@@ -41,31 +41,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
-
       # Deliberately no `registry-url:`. It writes an .npmrc containing
-      # `_authToken=${NODE_AUTH_TOKEN}`, and with trusted publishing there is no token to put
-      # there, so the variable never resolves. pnpm then refuses the whole file —
-      # "Issue while reading .npmrc. Failed to replace env in config: ${NODE_AUTH_TOKEN}" — and
-      # the registry read that `changeset publish` does to work out what is unpublished comes
-      # back without a `versions` array, crashing changesets in getUnpublishedPackages with
-      # "Cannot read properties of undefined (reading 'includes')".
+      # `_authToken=${NODE_AUTH_TOKEN}`, and trusted publishing has no token to put there, so
+      # the variable never resolves and the package manager warns on every read of the file.
       # OIDC supplies the credentials and registry.npmjs.org is already the default, so nothing
       # here needs an .npmrc entry.
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 24
-          cache: pnpm
+          cache: npm
 
       # Trusted publishing (OIDC) needs a recent npm; the one bundled with node may predate it.
       - name: Ensure npm supports trusted publishing (OIDC)
         run: npm install -g npm@latest
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+      - run: npm ci
+      - run: npm run build
 
       # With changesets pending, this opens/updates the version PR and publishes nothing.
-      # With none pending (i.e. the version PR just merged), it runs `pnpm release`, which
+      # With none pending (i.e. the version PR just merged), it runs `npm run release`, which
       # publishes any version not yet on the registry, then pushes the tag and creates the
       # GitHub release from the CHANGELOG entry.
       - name: Create version PR or publish
@@ -73,8 +67,8 @@ jobs:
         uses: changesets/action@8488615a623b1b9c987934bb89eae8af6a946ac1 # v2.1.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          version-script: pnpm changeset version
-          publish-script: pnpm release
+          version-script: npm run version
+          publish-script: npm run release
           commit-message: 'chore: version packages'
           pr-title: 'chore: version packages'
           create-github-releases: true

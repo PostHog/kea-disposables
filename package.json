@@ -1,7 +1,7 @@
 {
   "name": "kea-disposables",
   "version": "1.0.0",
-  "description": "Kea plugin for automatic resource cleanup. Register timers, listeners and subscriptions with a setup function that returns a cleanup function — teardown runs on unmount, and background work auto-pauses while the tab is hidden.",
+  "description": "Kea plugin for automatic resource cleanup. Register timers, listeners and subscriptions with a setup function that returns a cleanup function \u2014 teardown runs on unmount, and background work auto-pauses while the tab is hidden.",
   "license": "MIT",
   "author": "PostHog <hey@posthog.com>",
   "contributors": [
@@ -61,8 +61,9 @@
     "lint": "oxlint . && oxfmt --check .",
     "format": "oxfmt --write .",
     "changeset": "changeset",
+    "version": "changeset version",
     "release": "changeset publish",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "kea": ">= 3"
@@ -84,7 +85,6 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@10.33.2",
   "publishConfig": {
     "access": "public",
     "provenance": true

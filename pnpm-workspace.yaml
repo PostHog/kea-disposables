@@ -1,8 +1,0 @@
-packages:
-  - '.'
-
-# Supply-chain cooldown: reject any package version published less than 7 days
-# ago during resolution (`pnpm add`/`pnpm update`). Catches typo-squats and
-# compromised releases before they propagate. Already-locked versions are
-# unaffected, so `pnpm install --frozen-lockfile` in CI is not impacted.
-minimumReleaseAge: 10080
