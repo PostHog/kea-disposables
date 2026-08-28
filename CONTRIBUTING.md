@@ -30,8 +30,9 @@ SSR-safe behaviour; keep it that way.
 1. Branch off `main`.
 2. Make the change, with a test that fails without it.
 3. Run `pnpm changeset` and pick a bump type. Commit the generated file — the release pipeline
-   reads it, and a change that lands without one never gets released. CI enforces this on PRs;
-   for a PR that genuinely needs no release (docs, CI), run `pnpm changeset add --empty`.
+   reads it, and a change that lands without one never gets released. Nothing enforces this, so
+   it is on the author and the reviewer to notice. A PR that genuinely needs no release (docs,
+   CI, a dev-dependency bump) needs no changeset at all.
 4. Open a PR.
 
 Bump types:
@@ -68,9 +69,12 @@ Repo settings this depends on:
   workflow declares its own job-level `permissions:` block, which takes precedence over the
   repository default. Leaving the default read-only is fine.
 - npm trusted publishing configured for `kea-disposables` (see below).
-- If `main` is protected with required status checks, don't require the **Changeset present**
-  check — it is skipped on the `changeset-release/main` branch by design, and a skipped job
-  never reports success, so requiring it would block every version PR.
+- If `main` is protected with required status checks, don't require any of this repo's own CI
+  jobs. GitHub does not run workflows for pull requests opened by `GITHUB_TOKEN`, so none of
+  them run on the "chore: version packages" PR, and a job that never runs never reports success
+  — requiring one would permanently block every release. The version PR only ever contains a
+  version bump and a `CHANGELOG.md` entry, both generated from code that already passed CI on
+  `main`.
 
 ### npm trusted publishing (OIDC)
 
